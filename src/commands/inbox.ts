@@ -3,7 +3,7 @@ import { loadConfig, requireImap } from '../config';
 import { withImap } from '../imap';
 import { formatInboxTable, EmailSummary } from '../formatter';
 import { parseSince } from '../utils';
-import { simpleParser, ParsedMail } from 'mailparser';
+
 
 export function registerInboxCommand(program: Command): void {
   program
@@ -60,9 +60,7 @@ export function registerInboxCommand(program: Command): void {
             uid: true,
             envelope: true,
             flags: true,
-            bodyStructure: true,
-            source: { maxLength: 512 },
-          })) {
+          }, { uid: true })) {
             const envelope = msg.envelope!;
             const fromAddr = envelope.from?.[0];
             const from = fromAddr
@@ -71,24 +69,13 @@ export function registerInboxCommand(program: Command): void {
                 : fromAddr.address || '')
               : '';
 
-            let snippet = '';
-            if (msg.source) {
-              try {
-                const parsed = await simpleParser(msg.source) as ParsedMail;
-                const text = parsed.text || '';
-                snippet = text.replace(/\s+/g, ' ').trim().slice(0, 100);
-              } catch {
-                snippet = '';
-              }
-            }
-
             emails.push({
               uid: msg.uid,
               from,
               subject: envelope.subject || '(no subject)',
               date: envelope.date?.toISOString() || '',
               flags: Array.from(msg.flags || []),
-              snippet,
+              snippet: '',
             });
           }
 
