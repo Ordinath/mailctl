@@ -52,9 +52,19 @@ export function loadConfig(): AppConfig {
   // Also try .env in CWD (lower priority, won't override)
   dotenv.config();
 
+  const imapPort = parseInt(process.env.IMAP_PORT || '993', 10);
+  if (isNaN(imapPort)) {
+    throw new Error('Invalid IMAP_PORT: must be a number');
+  }
+
+  const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
+  if (isNaN(smtpPort)) {
+    throw new Error('Invalid SMTP_PORT: must be a number');
+  }
+
   const imap: ImapConfig = {
     host: process.env.IMAP_HOST || '',
-    port: parseInt(process.env.IMAP_PORT || '993', 10),
+    port: imapPort,
     user: process.env.IMAP_USER || '',
     pass: process.env.IMAP_PASS || '',
     tls: process.env.IMAP_TLS !== 'false',
@@ -62,7 +72,7 @@ export function loadConfig(): AppConfig {
 
   const smtp: SmtpConfig = {
     host: process.env.SMTP_HOST || '',
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
+    port: smtpPort,
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
     tls: process.env.SMTP_TLS !== 'false',

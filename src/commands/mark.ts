@@ -27,6 +27,15 @@ export function registerMarkCommand(program: Command): void {
         process.exit(1);
       }
 
+      if (opts.read && opts.unread) {
+        console.error('Error: --read and --unread are contradictory. Use one or the other.');
+        process.exit(1);
+      }
+      if (opts.flagged && opts.unflagged) {
+        console.error('Error: --flagged and --unflagged are contradictory. Use one or the other.');
+        process.exit(1);
+      }
+
       try {
         await withImap(config.imap, async (client) => {
           await client.mailboxOpen('INBOX');

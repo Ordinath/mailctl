@@ -38,6 +38,9 @@ export function registerSearchCommand(program: Command): void {
           if (opts.since) searchCriteria.since = parseSince(opts.since);
           if (opts.before) searchCriteria.before = parseSince(opts.before);
 
+          // NOTE: Fetches all matching UIDs then slices. For very large result
+          // sets this can be slow. Server-side SORT would be more efficient but
+          // not all IMAP servers support the SORT extension.
           const results = await client.search(searchCriteria, { uid: true }) as number[];
           if (results.length === 0) return [];
 

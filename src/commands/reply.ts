@@ -80,20 +80,22 @@ export function registerReplyCommand(program: Command): void {
 
         if (opts.all) {
           const myAddr = extractAddress(config.mailFrom).toLowerCase();
+          const toNorm = to.map((a) => a.toLowerCase());
           if (original.to) {
             const toAddrs = formatAddress(original.to);
             for (const addr of toAddrs.split(',').map((a: string) => a.trim())) {
               const email = extractAddress(addr).toLowerCase();
-              if (email !== myAddr && !to.includes(email)) {
+              if (email !== myAddr && !toNorm.includes(email)) {
                 cc.push(extractAddress(addr));
               }
             }
           }
           if (original.cc) {
+            const ccNorm = cc.map((a) => a.toLowerCase());
             const ccAddrs = formatAddress(original.cc);
             for (const addr of ccAddrs.split(',').map((a: string) => a.trim())) {
               const email = extractAddress(addr).toLowerCase();
-              if (email !== myAddr && !to.includes(email) && !cc.includes(email)) {
+              if (email !== myAddr && !toNorm.includes(email) && !ccNorm.includes(email)) {
                 cc.push(extractAddress(addr));
               }
             }

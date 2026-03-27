@@ -23,6 +23,6 @@ export async function withImap<T>(
   try {
     return await fn(client);
   } finally {
-    await client.logout();
+    try { await client.logout(); } catch { /* ignore logout errors */ }
   }
 }

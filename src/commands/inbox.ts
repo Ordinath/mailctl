@@ -38,6 +38,9 @@ export function registerInboxCommand(program: Command): void {
             const results = await client.search(searchCriteria, { uid: true });
             uids = results as number[];
           } else {
+            // NOTE: Fetches all UIDs then slices. For very large mailboxes this
+            // can be slow. A server-side SORT or sequence-based range would be
+            // more efficient but not all IMAP servers support SORT.
             const results = await client.search({ all: true }, { uid: true });
             uids = results as number[];
           }

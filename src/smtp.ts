@@ -18,12 +18,12 @@ export function createTransport(config: SmtpConfig) {
   return nodemailer.createTransport({
     host: config.host,
     port: config.port,
-    secure: config.port === 465,
+    secure: config.tls,
     auth: {
       user: config.user,
       pass: config.pass,
     },
-    tls: config.tls ? { rejectUnauthorized: true } : undefined,
+    tls: { rejectUnauthorized: true },
   });
 }
 

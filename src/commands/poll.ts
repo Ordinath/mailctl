@@ -25,15 +25,19 @@ export function registerPollCommand(program: Command): void {
         const emails = await withImap(config.imap, async (client) => {
           await client.mailboxOpen('INBOX');
 
-          const since = parseSince(opts.since);
-          const searchCriteria: any = { since };
+          let newUids: number[];
 
-          const results = await client.search(searchCriteria, { uid: true }) as number[];
-          if (results.length === 0) return [];
+          if (lastSeenUid > 0) {
+            // Cursor exists — fetch all UIDs greater than cursor, ignoring time window
+            const results = await client.search({ uid: `${lastSeenUid + 1}:*` }, { uid: true }) as number[];
+            newUids = results.filter((uid) => uid > lastSeenUid);
+          } else {
+            // No cursor yet — fall back to --since time window
+            const since = parseSince(opts.since);
+            const results = await client.search({ since }, { uid: true }) as number[];
+            newUids = results;
+          }
 
-          const newUids = lastSeenUid > 0
-            ? results.filter((uid) => uid > lastSeenUid)
-            : results;
 
           if (newUids.length === 0) return [];
 

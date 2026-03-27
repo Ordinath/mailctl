@@ -67,7 +67,7 @@ export function formatEmailFull(email: EmailFull): string {
   return lines.join('\n');
 }
 
-export function formatFolders(folders: { name: string; path: string; flags: string[] }[]): string {
+export function formatFolders(folders: { name: string; path: string }[]): string {
   if (folders.length === 0) return 'No folders found.';
   const lines: string[] = [];
   for (const f of folders) {
