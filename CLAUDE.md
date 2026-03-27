@@ -61,10 +61,25 @@ node dist/index.js --help    # or npm link to use `mailctl` globally
 - `mailctl mark <uid>` — set flags (--read, --unread, --flagged, --unflagged, --deleted)
 - `mailctl search` — search (--from, --subject, --body, --since, --before, --limit, --json)
 
+## Release Workflow
+
+mailctl is published to npm as a public package (`npm install -g mailctl`).
+
+After making changes:
+1. `npm run build` — compile TypeScript
+2. Bump version in `package.json` (semver: patch for fixes, minor for features, major for breaking changes)
+3. `git add -A && git commit -m "..." && git push`
+4. `npm publish` — publishes to npm registry
+
+npm auth token is stored on the Mac Mini. The npm account is `ordinath`.
+
+After publishing a new version, rebuild the NanoClaw Docker image (`container/build.sh`) to pick up the update.
+
 ## Conventions
 
 - All output defaults to human-readable; use `--json` for machine consumption
 - IMAP connections open/close per command (no persistent connection)
 - Non-zero exit codes on failure
 - The `poll` command uses a cursor file to track last-seen UID
+- Sent messages are automatically saved to the IMAP Sent folder
 - No tests yet — will add later
