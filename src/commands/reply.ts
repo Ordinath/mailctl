@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { loadConfig, requireImap, requireSmtp } from '../config';
-import { withImap } from '../imap';
+import { withImap, appendToSent } from '../imap';
 import { sendMail, SendOptions } from '../smtp';
 import { formatAddress, extractAddress, readStdin } from '../utils';
 import { simpleParser, ParsedMail } from 'mailparser';
@@ -125,8 +125,13 @@ export function registerReplyCommand(program: Command): void {
           })),
         };
 
-        const info = await sendMail(config.smtp, sendOpts);
+        const { info, raw } = await sendMail(config.smtp, sendOpts);
         console.log(`Reply sent: ${info.messageId}`);
+        try {
+          await appendToSent(config.imap, raw);
+        } catch (err: any) {
+          console.error(`Warning: sent but failed to save to Sent folder: ${err.message}`);
+        }
       } catch (err: any) {
         console.error(`Error: ${err.message}`);
         process.exit(1);

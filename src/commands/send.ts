@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { loadConfig, requireSmtp } from '../config';
 import { sendMail, SendOptions } from '../smtp';
+import { appendToSent } from '../imap';
 import { readStdin } from '../utils';
 
 function collect(value: string, previous: string[]): string[] {
@@ -68,8 +69,15 @@ export function registerSendCommand(program: Command): void {
       }
 
       try {
-        const info = await sendMail(config.smtp, sendOpts);
+        const { info, raw } = await sendMail(config.smtp, sendOpts);
         console.log(`Message sent: ${info.messageId}`);
+        if (config.imap.host && config.imap.user && config.imap.pass) {
+          try {
+            await appendToSent(config.imap, raw);
+          } catch (err: any) {
+            console.error(`Warning: sent but failed to save to Sent folder: ${err.message}`);
+          }
+        }
       } catch (err: any) {
         console.error(`Error sending email: ${err.message}`);
         process.exit(1);
