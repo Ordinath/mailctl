@@ -73,18 +73,19 @@ export function registerPollCommand(program: Command): void {
           return emails;
         });
 
-        // Update cursor to highest UID seen
-        if (emails.length > 0) {
-          const maxUid = Math.max(...emails.map((e) => e.uid));
-          writeCursor(cursorFile, maxUid);
-        }
-
+        // Output first, then update cursor — ensures output is never lost
         if (opts.json) {
           console.log(JSON.stringify(emails, null, 2));
         } else if (emails.length === 0) {
           console.log('No new messages.');
         } else {
           console.log(formatInboxTable(emails));
+        }
+
+        // Update cursor to highest UID seen (best-effort, may fail on read-only FS)
+        if (emails.length > 0) {
+          const maxUid = Math.max(...emails.map((e) => e.uid));
+          writeCursor(cursorFile, maxUid);
         }
 
         // Exit code: 0 = new messages, 1 = no new messages

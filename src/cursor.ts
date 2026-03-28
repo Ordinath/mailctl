@@ -15,9 +15,13 @@ export function readCursor(cursorFile: string): number {
 }
 
 export function writeCursor(cursorFile: string, uid: number): void {
-  const dir = path.dirname(cursorFile);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  try {
+    const dir = path.dirname(cursorFile);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(cursorFile, String(uid), 'utf-8');
+  } catch {
+    // Ignore write errors (e.g., read-only filesystem) — cursor is best-effort
   }
-  fs.writeFileSync(cursorFile, String(uid), 'utf-8');
 }
