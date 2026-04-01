@@ -246,6 +246,11 @@ describe('findAttachments', () => {
     expect(result[0].filename).toBe('part_1');
   });
 
+  it('should return empty for multipart with empty childNodes', () => {
+    const node = { type: 'multipart', subtype: 'mixed', childNodes: [] };
+    expect(findAttachments(node)).toEqual([]);
+  });
+
   it('uses parameters.name when dispositionParameters.filename is missing', () => {
     const node = {
       type: 'application',

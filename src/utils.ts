@@ -6,7 +6,7 @@ import * as path from 'path';
  */
 export function parseSince(value: string): Date {
   // Try relative duration first
-  const match = value.match(/^(\d+)\s*(m|min|h|hr|d|day|w|week)s?$/i);
+  const match = value.match(/^(\d+)\s*(m|min|h|hr|hour|d|day|w|week)s?$/i);
   if (match) {
     const num = parseInt(match[1], 10);
     const unit = match[2].toLowerCase();
@@ -19,6 +19,7 @@ export function parseSince(value: string): Date {
         break;
       case 'h':
       case 'hr':
+      case 'hour':
         ms = num * 60 * 60 * 1000;
         break;
       case 'd':

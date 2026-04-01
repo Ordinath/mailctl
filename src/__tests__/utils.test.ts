@@ -98,6 +98,20 @@ describe('parseSince', () => {
     expect(result.getTime()).toBe(new Date('2026-01-15T00:00:00Z').getTime());
   });
 
+  it('should parse plural suffixes (mins, hours, days, weeks)', () => {
+    const result5mins = parseSince('5mins');
+    expect(result5mins.getTime()).toBe(new Date('2026-04-01T11:55:00Z').getTime());
+
+    const result2hours = parseSince('2hours');
+    expect(result2hours.getTime()).toBe(new Date('2026-04-01T10:00:00Z').getTime());
+
+    const result3days = parseSince('3days');
+    expect(result3days.getTime()).toBe(new Date('2026-03-29T12:00:00Z').getTime());
+
+    const result1weeks = parseSince('1weeks');
+    expect(result1weeks.getTime()).toBe(new Date('2026-03-25T12:00:00Z').getTime());
+  });
+
   it('throws on invalid string', () => {
     expect(() => parseSince('abc')).toThrow('Invalid date/duration');
   });

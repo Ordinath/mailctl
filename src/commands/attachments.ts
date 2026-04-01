@@ -3,7 +3,7 @@ import { loadConfig, requireImap } from '../config';
 import { withImap } from '../imap';
 import { formatAttachmentsTable, AttachmentInfo } from '../formatter';
 
-interface BodyStructureNode {
+export interface BodyStructureNode {
   type?: string;
   subtype?: string;
   parameters?: Record<string, string>;

@@ -5,19 +5,7 @@ import { Command } from 'commander';
 import { loadConfig, requireImap } from '../config';
 import { withImap } from '../imap';
 import { sanitizeFilename } from '../utils';
-import { findAttachments } from './attachments';
-
-interface BodyStructureNode {
-  type?: string;
-  subtype?: string;
-  parameters?: Record<string, string>;
-  disposition?: string;
-  dispositionParameters?: Record<string, string>;
-  size?: number;
-  encoding?: string;
-  childNodes?: BodyStructureNode[];
-  part?: string;
-}
+import { findAttachments, BodyStructureNode } from './attachments';
 
 export function resolveOutputPath(dir: string, filename: string): string {
   const safe = sanitizeFilename(filename);
@@ -49,8 +37,8 @@ export function registerDownloadCommand(program: Command): void {
       }
 
       const outputDir = path.resolve(opts.output);
-      if (!fs.existsSync(outputDir)) {
-        console.error(`Error: Output directory does not exist: ${outputDir}`);
+      if (!fs.existsSync(outputDir) || !fs.statSync(outputDir).isDirectory()) {
+        console.error(`Error: Output path is not a directory: ${outputDir}`);
         process.exit(1);
       }
 
@@ -71,6 +59,10 @@ export function registerDownloadCommand(program: Command): void {
               throw new Error(`Message with UID ${uid} not found.`);
             }
 
+            if (!msg.bodyStructure) {
+              throw new Error(`Could not fetch body structure for UID ${uid}.`);
+            }
+
             const attachments = findAttachments(msg.bodyStructure as unknown as BodyStructureNode);
             const match = attachments.find((a) => a.part === partArg);
             const filename = match?.filename || `part_${partArg}`;
@@ -83,6 +75,10 @@ export function registerDownloadCommand(program: Command): void {
 
             if (!msg) {
               throw new Error(`Message with UID ${uid} not found.`);
+            }
+
+            if (!msg.bodyStructure) {
+              throw new Error(`Could not fetch body structure for UID ${uid}.`);
             }
 
             const attachments = findAttachments(msg.bodyStructure as unknown as BodyStructureNode);
@@ -99,7 +95,13 @@ export function registerDownloadCommand(program: Command): void {
             const { content } = await client.download(String(uid), part, { uid: true });
             const outPath = resolveOutputPath(outputDir, filename);
             const writeStream = fs.createWriteStream(outPath);
-            await pipeline(content, writeStream);
+            try {
+              await pipeline(content, writeStream);
+            } catch (err) {
+              // Clean up partial file
+              try { fs.unlinkSync(outPath); } catch {}
+              throw err;
+            }
             savedFiles.push({ part, filename: path.basename(outPath), path: outPath });
           }
 
