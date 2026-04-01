@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 /**
  * Parse a relative duration string like "5m", "1h", "2d" into milliseconds.
  * Also accepts ISO date strings directly.
@@ -62,6 +64,21 @@ export async function readStdin(): Promise<string | null> {
 export function extractAddress(addr: string): string {
   const match = addr.match(/<([^>]+)>/);
   return match ? match[1] : addr;
+}
+
+/**
+ * Sanitize a filename for safe filesystem use.
+ */
+export function sanitizeFilename(filename: string): string {
+  let safe = path.basename(filename);
+  safe = safe.replace(/\0/g, '');
+  safe = safe.replace(/[<>:"/\\|?*\x00-\x1f]/g, '_');
+  if (!safe || safe === '.' || safe === '..') safe = 'attachment';
+  if (safe.length > 200) {
+    const ext = path.extname(safe);
+    safe = safe.slice(0, 200 - ext.length) + ext;
+  }
+  return safe;
 }
 
 /**

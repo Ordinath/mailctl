@@ -61,4 +61,13 @@ mailctl mark 12345 --flagged
 
 # Search
 mailctl search --from user@example.com --since 7d --json
+
+# List attachments
+mailctl attachments 12345
+mailctl attachments 12345 --json
+
+# Download attachments
+mailctl download 12345              # download all attachments
+mailctl download 12345 1.2          # download specific part
+mailctl download 12345 --output /tmp --json
 ```

@@ -76,6 +76,33 @@ export function formatFolders(folders: { name: string; path: string }[]): string
   return lines.join('\n');
 }
 
+export interface AttachmentInfo {
+  part: string;
+  filename: string;
+  contentType: string;
+  size: number;
+}
+
+export function formatAttachmentsTable(attachments: AttachmentInfo[]): string {
+  if (attachments.length === 0) {
+    return 'No attachments found.';
+  }
+
+  const lines: string[] = [];
+  const header = `${'PART'.padEnd(8)} ${'FILENAME'.padEnd(40)} ${'TYPE'.padEnd(25)} SIZE`;
+  lines.push(header);
+  lines.push('-'.repeat(header.length));
+
+  for (const a of attachments) {
+    const filename = truncate(a.filename, 38);
+    const type = truncate(a.contentType, 23);
+    lines.push(`${a.part.padEnd(8)} ${filename.padEnd(40)} ${type.padEnd(25)} ${formatSize(a.size)}`);
+  }
+
+  lines.push(`\n${attachments.length} attachment(s)`);
+  return lines.join('\n');
+}
+
 function formatDate(iso: string): string {
   try {
     const d = new Date(iso);
