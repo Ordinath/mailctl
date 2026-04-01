@@ -10,13 +10,15 @@ import { registerPollCommand } from './commands/poll';
 import { registerFoldersCommand } from './commands/folders';
 import { registerMarkCommand } from './commands/mark';
 import { registerSearchCommand } from './commands/search';
+import { registerAttachmentsCommand } from './commands/attachments';
+import { registerDownloadCommand } from './commands/download';
 
 const program = new Command();
 
 program
   .name('mailctl')
   .description('Lightweight CLI for IMAP/SMTP email operations')
-  .version('1.0.0');
+  .version('1.1.0');
 
 registerInboxCommand(program);
 registerReadCommand(program);
@@ -27,5 +29,7 @@ registerPollCommand(program);
 registerFoldersCommand(program);
 registerMarkCommand(program);
 registerSearchCommand(program);
+registerAttachmentsCommand(program);
+registerDownloadCommand(program);
 
 program.parse(process.argv);
