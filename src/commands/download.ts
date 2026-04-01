@@ -19,7 +19,7 @@ interface BodyStructureNode {
   part?: string;
 }
 
-function resolveOutputPath(dir: string, filename: string): string {
+export function resolveOutputPath(dir: string, filename: string): string {
   const safe = sanitizeFilename(filename);
   const ext = path.extname(safe);
   const base = safe.slice(0, safe.length - ext.length);
